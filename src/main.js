@@ -3,6 +3,7 @@ import { Color, DirectionalLight, PerspectiveCamera, Scene } from "three";
 import { WebGPURenderer } from "three/webgpu";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { createObject } from "./object/object.js";
+import ring from "./ring/ring.js";
 
 const canvas = document.querySelector("#webgpu-canvas");
 const scene = new Scene();
@@ -39,6 +40,7 @@ const [{ object, update: updateObject }] = await Promise.all([
   renderer.init(),
 ]);
 scene.add(object);
+scene.add(ring());
 renderer.setAnimationLoop(animate);
 
 function resize() {
