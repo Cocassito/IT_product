@@ -20,8 +20,8 @@ export function createObjectGui(settings, restart) {
   introFolder.add(settings, "spinTurns", 0, 10, 0.1).name("Spin turns");
   introFolder.add({ restart }, "restart");
 
-  positionFolder.open();
-  rotationFolder.open();
-  introFolder.open();
-  objectFolder.open();
+  positionFolder.close();
+  rotationFolder.close();
+  introFolder.close();
+  objectFolder.close();
 }

@@ -1,13 +1,13 @@
 import * as THREE from "three/webgpu";
-import { Fn, If, Discard, positionLocal, length, uniform, vec4, color } from "three/tsl";
 import { createRingGui } from "./ringGui.js";
+import { ringMaterial } from "./ringMaterial.js";
 
 export default function ring() {
   const settings = {
     radiusTop: 5,
     radiusBottom: 5,
     height: 0.1,
-    radialSegments: 65,
+    radialSegments: 200,
     positionX: 0,
     positionY: 0.5,
     positionZ: 0,
@@ -15,34 +15,18 @@ export default function ring() {
     rotationY: 0,
     rotationZ: 0,
     scale: 0.6,
-    color: "#00f7ff",
+    colorLow: "#ff1b1b",
+    colorHigh: "#00f7ff",
+    threshold: 0,
+    waveFreq: 4,
+    waveAmp: 0.2,
     opacity: 1,
     wireframe: false,
-    innerRadius: 4.9        ,     
-    edgeSoftness: 0,  
+    innerRadius: 4.9,
+    edgeSoftness: 0,
   };
 
-  const material = new THREE.MeshBasicMaterial({
-    color: settings.color,
-    transparent: true,
-  });
-
-  const uInnerRadius = uniform(settings.innerRadius);
-  const uSoftness = uniform(settings.edgeSoftness);
-  const uColor = uniform(color(settings.color));
-  const uOpacity = uniform(settings.opacity);
-
-  const radialDist = length(positionLocal.xz);
-
-  material.colorNode = Fn(() => {
-    If(radialDist.lessThan(uInnerRadius), () => {
-      Discard();
-    });
-
-    const fade = radialDist.sub(uInnerRadius).div(uSoftness.max(0.0001)).clamp(0, 1);
-    return vec4(uColor, uOpacity.mul(fade));
-  })();
-
+  const { material, updateMaterial } = ringMaterial(settings);
   const cylinder = new THREE.Mesh(createGeometry(settings), material);
 
   function update() {
@@ -57,12 +41,8 @@ export default function ring() {
       settings.rotationZ,
     );
     cylinder.scale.setScalar(settings.scale);
-    material.wireframe = settings.wireframe;
 
-    uColor.value.set(settings.color);
-    uOpacity.value = settings.opacity;
-    uInnerRadius.value = settings.innerRadius;
-    uSoftness.value = settings.edgeSoftness;
+    updateMaterial(settings);
   }
 
   function updateGeometry() {
@@ -82,6 +62,7 @@ function createGeometry(settings) {
     settings.radiusBottom,
     settings.height,
     settings.radialSegments,
-    1,
+    32,
+    true,
   );
 }
