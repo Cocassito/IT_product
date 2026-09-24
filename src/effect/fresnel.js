@@ -1,11 +1,14 @@
 import { MeshStandardNodeMaterial } from 'three/webgpu'
-import { color, uniform, sin, time, float } from 'three/tsl'
-import { createFresnelFactor } from './fresnelFactor.js'
+import { color, uniform, sin, time, float, dot, positionViewDirection, normalView } from 'three/tsl'
+
+export function createFresnelFactor(power = 2.0) {
+  return dot(positionViewDirection, normalView).oneMinus().pow(power)
+}
 
 export function applyHighlight(scene, { rimColor = 0x5ac8ff, rimIntensity = 1.4 } = {}) {
   const intensity = uniform(rimIntensity)
-  const pulse = float(0.7).add(sin(time.mul(1.5)).mul(0.3))
-  const highlightNode = color(rimColor).mul(createFresnelFactor(2.0)).mul(intensity).mul(pulse)
+  const pulse = float(1.7).add(sin(time.mul(1.5)).mul(0.3))
+  const highlightNode = color(rimColor).mul(createFresnelFactor(10.0)).mul(intensity).mul(pulse)
 
   scene.traverse((child) => {
     if (!child.isMesh) return

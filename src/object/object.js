@@ -1,11 +1,11 @@
 import { Group } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { centerAndScaleModel } from "./centerAndScaleModel.js";
-import { applyHighlight } from "../effect/applyHighlight.js";
 import { createIntroAnimation } from "../intro/introAnimation.js";
 import { createObjectGui } from "./objectGui.js";
+import { applyHighlight } from "../effect/fresnel.js";
 
-const modelUrl = new URL("../assets/model/Prototype_IT.glb", import.meta.url);
+const modelUrl = new URL("../assets/model/Prototype_IT3.glb", import.meta.url);
 
 const DEFAULT_SETTINGS = {
   positionX: 0,

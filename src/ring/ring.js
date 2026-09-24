@@ -12,7 +12,7 @@ export default function ring() {
     positionY: 0.5,
     positionZ: 0,
     rotationX: 0,
-    rotationY: 0,
+    rotationY: -2.60,
     rotationZ: 0,
     scale: 0.6,
     colorLow: "#ff1b1b",

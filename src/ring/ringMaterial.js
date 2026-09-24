@@ -36,8 +36,13 @@ export function ringMaterial(settings) {
       .mul(uWaveFreq),
   ).mul(uWaveAmp);
 
+
+  const maxAmplitude = 3.0; 
+
+  const amplitudeTime = mx_noise_float(time.mul(0.5)).mul(maxAmplitude);
+
   //const noise = mx_noise_float(positionLocal.x.mul(2).add(time.mul(0.1)), 1);
-  const noise = mx_noise_float(uv().x.mul(10).add(time.mul(0.1)), 2);
+  const noise = mx_noise_float(uv().x.mul(10).add(time.mul(0.1)), amplitudeTime);
   //const displacedY = positionLocal.y.add(wave);
   const displacedY = positionLocal.y.add(noise);
   material.positionNode = vec3(positionLocal.x, displacedY, positionLocal.z);
