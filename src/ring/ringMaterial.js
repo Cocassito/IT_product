@@ -11,6 +11,9 @@ import {
   smoothstep,
   sin,
   uv,
+  min,
+  time,
+  mx_noise_float
 } from "three/tsl";
 
 export function ringMaterial(settings) {
@@ -32,27 +35,34 @@ export function ringMaterial(settings) {
       .x.mul(Math.PI * 2)
       .mul(uWaveFreq),
   ).mul(uWaveAmp);
-  const displacedY = positionLocal.y.add(wave);
+
+  //const noise = mx_noise_float(positionLocal.x.mul(2).add(time.mul(0.1)), 1);
+  const noise = mx_noise_float(uv().x.mul(10).add(time.mul(0.1)), 2);
+  //const displacedY = positionLocal.y.add(wave);
+  const displacedY = positionLocal.y.add(noise);
   material.positionNode = vec3(positionLocal.x, displacedY, positionLocal.z);
+  
 
   
   //D2GRAD2
   material.colorNode = Fn(() => {
-    const factor = smoothstep(
-      uThreshold.sub(0.4),
-      uThreshold.add(0.05),
-      displacedY,
-    );
-    const finalColor = mix(uColorLow, uColorHigh, factor);
-    
-    //MASK
-    const radialDist = length(positionLocal.xz);
-    const fade = radialDist
-      .sub(uInnerRadius)
-      .div(uSoftness.max(0.0001))
-      .clamp(0, 1);
-    return vec4(finalColor, uOpacity.mul(fade));
-  })();
+  const factor = smoothstep(uThreshold.sub(0.4), uThreshold.add(0.05), displacedY);
+  const finalColor = mix(uColorLow, uColorHigh, factor);
+
+
+  ///FONDU START/END
+  const fadeStart = smoothstep(0.05, 0.15, uv().x);
+  const fadeEnd = smoothstep(1, 0.9, uv().x);
+  const edgeFade = min(fadeStart, fadeEnd);
+
+  //FONDU INTER
+  const radialDist = length(positionLocal.xz);
+  const radialFade = radialDist.sub(uInnerRadius).div(uSoftness.max(0.0001)).clamp(0, 1);
+
+  const finalAlpha = uOpacity.mul(radialFade).mul(edgeFade);
+
+  return vec4(finalColor, finalAlpha);
+})();
 
   function updateMaterial(s = settings) {
     uInnerRadius.value = s.innerRadius;
@@ -61,8 +71,6 @@ export function ringMaterial(settings) {
     uColorLow.value.set(s.colorLow);
     uColorHigh.value.set(s.colorHigh);
     uThreshold.value = s.threshold;
-    uWaveFreq.value = s.waveFreq;
-    uWaveAmp.value = s.waveAmp;
   }
 
   return { material, updateMaterial };

@@ -15,7 +15,7 @@ export function createRingGui(settings, update, updateGeometry) {
     .onChange(updateGeometry);
   geometryFolder.add(settings, "height", 0.1, 5, 0.1).onChange(updateGeometry);
   geometryFolder
-    .add(settings, "radialSegments", 3, 500, 1)
+    .add(settings, "radialSegments", 3, 1000, 1)
     .name("Segments")
     .onChange(updateGeometry);
 
@@ -52,8 +52,6 @@ export function createRingGui(settings, update, updateGeometry) {
   materialFolder.addColor(settings, "colorLow").onChange(update);
   materialFolder.addColor(settings, "colorHigh").onChange(update);
   materialFolder.add(settings, "threshold", -1, 1, 0.01).onChange(update);
-  materialFolder.add(settings, "waveFreq", 1, 20, 1).onChange(update);
-  materialFolder.add(settings, "waveAmp", 0, 1, 0.01).onChange(update);
   materialFolder.add(settings, "opacity", 0, 1, 0.01).onChange(update);
   materialFolder.add(settings, "innerRadius", 0.1, 10, 0.1).onChange(update);
   materialFolder.add(settings, "edgeSoftness", 0, 10, 0.1).onChange(update);
