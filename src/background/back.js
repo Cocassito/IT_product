@@ -17,10 +17,10 @@ export function createPillarsBackground(settings = {}) {
     gridSize: 200,          
     spacing: 0.1,          
     pillarWidth: 0.5,      
-    baseHeight: 0.05,       
+    baseHeight: 0.2,       
     amplitude: 0.6,         
-    speed: 0.6,             
-    speedVariance: 1.5,     
+    speed: 0.1,             
+    speedVariance: 0.5,     
     colorLow: "#0b101c",
     colorHigh: "#3d6fb0",
     yOffset: -2,            
@@ -39,7 +39,7 @@ export function createPillarsBackground(settings = {}) {
 
   const hash = (x) => fract(sin(x.mul(12.9898)).mul(43758.5453123));
 
-  const material = new THREE.MeshStandardNodeMaterial({ roughness: 0.5 });
+  const material = new THREE.MeshStandardNodeMaterial({ roughness: 0.5, metalness : 0.5  });
 
   const index = instanceIndex.toFloat();
   const column = index.mod(size);
@@ -51,13 +51,13 @@ export function createPillarsBackground(settings = {}) {
   const x = centeredColumn.mul(s.spacing);
   const z = centeredRow.mul(s.spacing);
 
-  const seedPhase = hash(index).mul(6.2831853); 
-  const seedSpeed = hash(index.add(731.234)); 
+  const seedPhase = hash(index).mul(6.); 
+  const seedSpeed = hash(index.add(730)); 
 
   const individualSpeed = uSpeed.add(seedSpeed.mul(uSpeedVariance));
   const osc = time.mul(individualSpeed).add(seedPhase).sin(); 
 
-  const height = osc.add(1).mul(0.5).mul(uAmplitude).add(uBaseHeight);
+  const height = osc.add(1).mul(0.7).mul(uAmplitude).add(uBaseHeight);
 
   material.positionNode = positionLocal
     .mul(vec3(s.pillarWidth, height, s.pillarWidth))
