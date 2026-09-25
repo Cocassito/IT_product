@@ -67,8 +67,8 @@ export function createRingGui(settings, update, updateGeometry) {
   materialFolder.add(settings, "skew", 0, 10, 0.1).onChange(update);
   materialFolder.add(settings, "smoothAbs", 0, 10, 0.1).onChange(update);
 
-  geometryFolder.open();
-  positionFolder.open();
-  materialFolder.open();
-  ringFolder.open();
+  geometryFolder.close();
+  positionFolder.close();
+  materialFolder.close();
+  ringFolder.close();
 }

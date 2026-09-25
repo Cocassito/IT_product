@@ -1,4 +1,5 @@
 import * as THREE from "three/webgpu";
+import { MeshBasicNodeMaterial } from "three/webgpu";
 import {
   Fn,
   positionLocal,
@@ -16,10 +17,11 @@ import {
   sqrt,
   time,
   mx_noise_float,
+  mrt,
 } from "three/tsl";
 
 export function ringMaterial(settings) {
-  const material = new THREE.MeshBasicMaterial({
+  const material = new MeshBasicNodeMaterial({
     transparent: true,
     side: THREE.DoubleSide,
   });
@@ -37,6 +39,10 @@ export function ringMaterial(settings) {
   const uSmoothAbs = uniform(settings.smoothAbs);
   const uAmplitudeBoost = uniform(settings.amplitudeBoost);
   const uColorBlend = uniform(settings.colorBlend);
+  // BLOOM tah flash dans les yeux
+  const uBloomBase = uniform(0.5);
+  const uBloomMultiplier = uniform(1);
+  const uBloomMax = uniform(3);
 
   const maxAmplitude = 3.0;
 
@@ -65,6 +71,13 @@ export function ringMaterial(settings) {
 
   const displacedY = positionLocal.y.add(displacedNoise);
   material.positionNode = vec3(positionLocal.x, displacedY, positionLocal.z);
+
+  //BLOOM
+  const bloomFromAmplitude = uBloomBase
+    .add(abs(displacedNoise).mul(uBloomMultiplier))
+    .clamp(0, uBloomMax);
+
+  material.mrtNode = mrt({ bloomIntensity: bloomFromAmplitude });
 
   //DEGRAD2 EN FONCTION DES SOMMETS
   material.colorNode = Fn(() => {
@@ -113,5 +126,12 @@ export function ringMaterial(settings) {
     uAnimAmplitude.value = v;
   }
 
-  return { material, updateMaterial, setAnimAmplitude };
+  return {
+    material,
+    updateMaterial,
+    setAnimAmplitude,
+    uBloomMultiplier,
+    uBloomBase,
+    uBloomMax,
+  };
 }

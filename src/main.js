@@ -1,4 +1,6 @@
 import "./style.css";
+import * as THREE from 'three/webgpu'
+
 import {
   Color,
   DirectionalLight,
@@ -11,6 +13,9 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { createObject } from "./object/object.js";
 import ring from "./ring/ring.js";
 import { createRingIntroAnimation } from "./intro/ringIntro.js";
+import { bloom } from 'three/addons/tsl/display/BloomNode.js'
+import { float, mrt, output, pass } from 'three/tsl'
+import { createPostProcGui } from "./effect/postProcGui.js";
 
 const canvas = document.querySelector("#webgpu-canvas");
 const scene = new Scene();
@@ -36,6 +41,44 @@ scene.add(
   new DirectionalLight(0xffe6c5, 4).translateX(-3).translateY(5).translateZ(4),
 );
 
+const bloomSettings = {
+  strength: 1.5,
+  radius: 0.4,
+  threshold: 0,
+  resolutionScale: 1,
+};
+
+function updateBloom() {
+  bloomPass.strength.value = bloomSettings.strength;
+  bloomPass.radius.value = bloomSettings.radius;
+  bloomPass.threshold.value = bloomSettings.threshold;
+}
+
+//POST PROC
+const renderPipeline = new THREE.RenderPipeline(renderer)
+const scenePass = pass(scene, camera)
+
+scenePass.setMRT(mrt({
+  output: output, 
+  bloomIntensity: float(0)
+}))
+
+const sceneOutput = scenePass.getTextureNode('output')
+const bloomIntensity = scenePass.getTextureNode('bloomIntensity').r
+
+
+// Bloom pass
+const bloomPass = bloom(
+  sceneOutput.mul(bloomIntensity),
+  bloomSettings.strength,
+  bloomSettings.radius,
+  bloomSettings.threshold
+);
+const bloomOutput = sceneOutput.add(bloomPass)
+
+renderPipeline.outputNode = bloomOutput
+
+
 //IT
 const [{ object, update: updateObject, setProgress }] = await Promise.all([
   createObject(),
@@ -47,6 +90,12 @@ scene.add(object);
 const ringObj = ring();
 scene.add(ringObj.mesh);
 const ringIntro = createRingIntroAnimation(ringObj, ringObj.settings);
+
+createPostProcGui(bloomSettings, updateBloom, {
+  uBloomBase: ringObj.uBloomBase,
+  uBloomMultiplier: ringObj.uBloomMultiplier,
+  uBloomMax: ringObj.uBloomMax,
+});
 
 let ringIntroDone = false;
 
@@ -81,7 +130,9 @@ function animate() {
   }
 
   controls.update();
-  renderer.render(scene, camera);
+  // renderer.render(scene, camera);
+  renderPipeline.render()
+
 }
 
 window.addEventListener("resize", resize);
