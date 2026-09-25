@@ -26,7 +26,7 @@ export default function ring() {
     edgeSoftness: 0,
     amplitudeBoost: 2,
     smoothAbs: 0.3,
-    skew: 0.7
+    skew: 0.5
   };
 
   const { material, updateMaterial, setAnimAmplitude } = ringMaterial(settings);
@@ -55,7 +55,7 @@ export default function ring() {
   createRingGui(settings, update, updateGeometry);
   update();
 
-  return { mesh: cylinder, setAnimAmplitude };
+  return { mesh: cylinder, setAnimAmplitude, updateMaterial, settings };
 }
 
 function createGeometry(settings) {

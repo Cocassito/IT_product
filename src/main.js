@@ -10,6 +10,7 @@ import { WebGPURenderer } from "three/webgpu";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { createObject } from "./object/object.js";
 import ring from "./ring/ring.js";
+import { createRingIntroAnimation } from "./intro/ringIntro.js";
 
 const canvas = document.querySelector("#webgpu-canvas");
 const scene = new Scene();
@@ -45,6 +46,9 @@ scene.add(object);
 //RING
 const ringObj = ring();
 scene.add(ringObj.mesh);
+const ringIntro = createRingIntroAnimation(ringObj, ringObj.settings);
+
+let ringIntroDone = false;
 
 //SOURIS CONTROL
 window.addEventListener("mousemove", (event) => {
@@ -71,6 +75,11 @@ function animate() {
   timer.update();
   const delta = timer.getDelta();
   updateObject(delta);
+
+  if (!ringIntroDone) {
+    ringIntroDone = ringIntro.update();
+  }
+
   controls.update();
   renderer.render(scene, camera);
 }
