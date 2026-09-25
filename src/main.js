@@ -19,6 +19,7 @@ import { createPostProcGui } from "./effect/postProcGui.js";
 import { createPillarsBackground } from "./background/back.js";
 import createPillarsGui from "./background/backGui.js";
 import { placeRingsAround } from "./ring/ringPlacement.js";
+import createPillarsIntroAnimation from "./background/backIntro.js";
 
 const canvas = document.querySelector("#webgpu-canvas");
 const scene = new Scene();
@@ -88,6 +89,12 @@ const pillars = createPillarsBackground();
 scene.add(pillars.mesh);
 createPillarsGui(pillars); 
 
+const backIntro = createPillarsIntroAnimation(pillars, {
+  duration: 3,
+  delay: 0.2,
+  spread: 1.2,
+});
+
 
 //IT
 const [{ object, update: updateObject, setProgress }] = await Promise.all([
@@ -118,6 +125,7 @@ createPostProcGui(bloomSettings, updateBloom, {
 });
 
 let ringIntroDone = false;
+let backIntroDone = false;
 
 //SOURIS CONTROL
 window.addEventListener("mousemove", (event) => {
@@ -147,6 +155,9 @@ function animate() {
 
   if (!ringIntroDone) {
     ringIntroDone = ringIntro.update();
+  }
+   if (!backIntroDone) {
+    backIntroDone = backIntro.update();
   }
 
   controls.update();
