@@ -1,5 +1,11 @@
 import "./style.css";
-import { Color, DirectionalLight, PerspectiveCamera, Scene } from "three";
+import {
+  Color,
+  DirectionalLight,
+  PerspectiveCamera,
+  Scene,
+  Timer,
+} from "three";
 import { WebGPURenderer } from "three/webgpu";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { createObject } from "./object/object.js";
@@ -9,7 +15,6 @@ const canvas = document.querySelector("#webgpu-canvas");
 const scene = new Scene();
 scene.background = new Color(0x0b101c);
 
-/////CAMERA
 const camera = new PerspectiveCamera(
   42,
   window.innerWidth / window.innerHeight,
@@ -25,22 +30,33 @@ renderer.shadowMap.enabled = true;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-// controls.minDistance = 3
-// controls.maxDistance = 7
-// controls.target.set(0, 1, 0)
 
-/////LIGHT/////
 scene.add(
   new DirectionalLight(0xffe6c5, 4).translateX(-3).translateY(5).translateZ(4),
 );
 
-//////IT///////
-const [{ object, update: updateObject }] = await Promise.all([
+//IT
+const [{ object, update: updateObject, setProgress }] = await Promise.all([
   createObject(),
   renderer.init(),
 ]);
 scene.add(object);
-scene.add(ring());
+
+//RING
+const ringObj = ring();
+scene.add(ringObj.mesh);
+
+//SOURIS CONTROL
+window.addEventListener("mousemove", (event) => {
+  const xNorm = event.clientX / window.innerWidth;
+
+  setProgress(1 - xNorm);
+
+  // Amplitude signée : -1 à gauche // 0 au centre // +1 à droite
+  const signed = (xNorm - 0.5) * 2;
+  ringObj.setAnimAmplitude(signed);
+});
+
 renderer.setAnimationLoop(animate);
 
 function resize() {
@@ -49,8 +65,12 @@ function resize() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
+const timer = new Timer();
+
 function animate() {
-  updateObject();
+  timer.update();
+  const delta = timer.getDelta();
+  updateObject(delta);
   controls.update();
   renderer.render(scene, camera);
 }

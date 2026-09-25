@@ -1,4 +1,4 @@
-import { Group } from "three";
+import { Group, AnimationMixer } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { centerAndScaleModel } from "./centerAndScaleModel.js";
 import { createIntroAnimation } from "../intro/introAnimation.js";
@@ -20,7 +20,7 @@ const DEFAULT_SETTINGS = {
 };
 
 export async function createObject() {
-  const { scene } = await new GLTFLoader().loadAsync(modelUrl.href);
+  const { scene, animations } = await new GLTFLoader().loadAsync(modelUrl.href);
   centerAndScaleModel(scene);
   applyHighlight(scene);
 
@@ -28,8 +28,26 @@ export async function createObject() {
   object.add(scene);
 
   const settings = { ...DEFAULT_SETTINGS };
-  const { update, restart } = createIntroAnimation(object, settings);
+  const { update: introUpdate, restart } = createIntroAnimation(
+    object,
+    settings,
+  );
   createObjectGui(settings, restart);
 
-  return { object, update };
+  const mixer = new AnimationMixer(scene);
+  const clip = animations[0];
+  const action = mixer.clipAction(clip);
+  action.play();
+  action.paused = true; 
+
+  function setProgress(t) {
+    action.time = t * clip.duration;
+    mixer.update(0);
+  }
+
+  function update(delta) {
+    introUpdate(delta);
+  }
+
+  return { object, update, setProgress };
 }

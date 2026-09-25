@@ -51,10 +51,21 @@ export function createRingGui(settings, update, updateGeometry) {
   materialFolder.add(settings, "scale", 0.1, 3, 0.1).onChange(update);
   materialFolder.addColor(settings, "colorLow").onChange(update);
   materialFolder.addColor(settings, "colorHigh").onChange(update);
+  materialFolder
+    .addColor(settings, "colorPositive")
+    .name("Color (positive)")
+    .onChange(update);
+  materialFolder
+    .add(settings, "colorBlend", 0.01, 1, 0.01)
+    .name("Color blend width")
+    .onChange(update);
   materialFolder.add(settings, "threshold", -1, 1, 0.01).onChange(update);
   materialFolder.add(settings, "opacity", 0, 1, 0.01).onChange(update);
   materialFolder.add(settings, "innerRadius", 0.1, 10, 0.1).onChange(update);
   materialFolder.add(settings, "edgeSoftness", 0, 10, 0.1).onChange(update);
+  materialFolder.add(settings, "amplitudeBoost", 0, 10, 0.1).onChange(update);
+  materialFolder.add(settings, "skew", 0, 10, 0.1).onChange(update);
+  materialFolder.add(settings, "smoothAbs", 0, 10, 0.1).onChange(update);
 
   geometryFolder.open();
   positionFolder.open();

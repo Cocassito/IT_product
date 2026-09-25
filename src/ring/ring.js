@@ -12,19 +12,24 @@ export default function ring() {
     positionY: 0.5,
     positionZ: 0,
     rotationX: 0,
-    rotationY: -2.60,
+    rotationY: -2.6,
     rotationZ: 0,
     scale: 0.6,
     colorLow: "#ff1b1b",
     colorHigh: "#00f7ff",
+    colorPositive: "#1bff5e",
+    colorBlend: 0.5,
     threshold: 0,
     opacity: 1,
     wireframe: false,
     innerRadius: 4.9,
     edgeSoftness: 0,
+    amplitudeBoost: 2,
+    smoothAbs: 0.3,
+    skew: 0.7
   };
 
-  const { material, updateMaterial } = ringMaterial(settings);
+  const { material, updateMaterial, setAnimAmplitude } = ringMaterial(settings);
   const cylinder = new THREE.Mesh(createGeometry(settings), material);
 
   function update() {
@@ -39,7 +44,6 @@ export default function ring() {
       settings.rotationZ,
     );
     cylinder.scale.setScalar(settings.scale);
-
     updateMaterial(settings);
   }
 
@@ -51,7 +55,7 @@ export default function ring() {
   createRingGui(settings, update, updateGeometry);
   update();
 
-  return cylinder;
+  return { mesh: cylinder, setAnimAmplitude };
 }
 
 function createGeometry(settings) {
