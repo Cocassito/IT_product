@@ -13,7 +13,7 @@ const DEFAULT_SETTINGS = {
   positionZ: 0,
   rotationX: 0,
   rotationY: -0.96,
-  rotationZ: 0.18,
+  rotationZ: 0,
   introDuration: 1.6,
   startHeight: -2.8,
   spinTurns: 1,

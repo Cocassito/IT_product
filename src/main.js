@@ -16,6 +16,9 @@ import { createRingIntroAnimation } from "./intro/ringIntro.js";
 import { bloom } from 'three/addons/tsl/display/BloomNode.js'
 import { float, mrt, output, pass } from 'three/tsl'
 import { createPostProcGui } from "./effect/postProcGui.js";
+import { createPillarsBackground } from "./background/back.js";
+import createPillarsGui from "./background/backGui.js";
+import { placeRingsAround } from "./ring/ringPlacement.js";
 
 const canvas = document.querySelector("#webgpu-canvas");
 const scene = new Scene();
@@ -38,8 +41,9 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 
 scene.add(
-  new DirectionalLight(0xffe6c5, 4).translateX(-3).translateY(5).translateZ(4),
+  new DirectionalLight(0xffe6c5, 6).translateX(-3).translateY(5).translateZ(4),
 );
+scene.fog = new THREE.FogExp2(0x0b101c, 0.2);
 
 const bloomSettings = {
   strength: 1.5,
@@ -78,6 +82,12 @@ const bloomOutput = sceneOutput.add(bloomPass)
 
 renderPipeline.outputNode = bloomOutput
 
+//BACK 
+
+const pillars = createPillarsBackground();
+scene.add(pillars.mesh);
+createPillarsGui(pillars); 
+
 
 //IT
 const [{ object, update: updateObject, setProgress }] = await Promise.all([
@@ -90,6 +100,16 @@ scene.add(object);
 const ringObj = ring();
 scene.add(ringObj.mesh);
 const ringIntro = createRingIntroAnimation(ringObj, ringObj.settings);
+
+//RINGS DUPLIQUÉS
+const extraRings = placeRingsAround(ringObj, 50, {
+  minRadius: 1,
+  maxRadius: 14,
+  scaleRange: [0.15, 0.4],
+  heightRange: [-1, 1],
+});
+extraRings.forEach((r) => scene.add(r.mesh));
+
 
 createPostProcGui(bloomSettings, updateBloom, {
   uBloomBase: ringObj.uBloomBase,

@@ -2,7 +2,10 @@ import * as THREE from "three/webgpu";
 import { createRingGui } from "./ringGui.js";
 import { ringMaterial } from "./ringMaterial.js";
 
-export default function ring() {
+export default function ring(overrides = {}, options = {}) {
+
+  const { withGui = true } = options;
+
   const settings = {
     radiusTop: 5,
     radiusBottom: 5,
@@ -27,6 +30,8 @@ export default function ring() {
     amplitudeBoost: 2,
     smoothAbs: 0.3,
     skew: 0.5,
+        ...overrides,
+
   };
 
   const {
@@ -59,7 +64,9 @@ export default function ring() {
     cylinder.geometry = createGeometry(settings);
   }
 
-  createRingGui(settings, update, updateGeometry);
+  if (withGui) {
+    createRingGui(settings, update, updateGeometry);
+  }
   update();
 
   return {
